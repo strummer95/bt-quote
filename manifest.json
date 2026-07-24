@@ -1,10 +1,10 @@
 {
   "name": "BT Quote",
   "slug": "bt-quote",
-  "version": "0.1.0",
-  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.1.0.zip",
+  "version": "0.2.0",
+  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.2.0.zip",
   "homepage": "https://boomerts.com",
   "tested": "6.6",
   "requires": "5.8",
-  "changelog": "v0.1.0 — Initial release. Pricing engine (print + embroidery) and quote submission ported from WPCode snippets into the plugin. Drop-in: serves POST /wp-json/boomerts/v1/price and /quote with identical formulas and response shapes (5,946-case parity verified). Reusable PHP API (btq_price) for catalog/portal/checkout integration. GitHub auto-update."
+  "changelog": "v0.2.0 — Pricing editor (BT Quote → Pricing). Edit any tier/garment/multiplier, percent-adjust a section or everything, per-section and full Reset to factory defaults. Factory numbers stay locked in code; edits save as overrides. Live sample prices + modified highlighting. Engine parity on defaults re-verified (5,946 cases)."
 }

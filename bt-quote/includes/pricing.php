@@ -12,8 +12,11 @@
  */
 if (!defined('ABSPATH')) exit;
 
-/** All pricing tables in one place. Filterable so tuning never needs a code edit elsewhere. */
-function btq_pricing_tables() {
+/**
+ * FACTORY DEFAULT pricing tables — the numbers the shop runs on today.
+ * Never edited by the admin UI; "Reset to default" always lands back here.
+ */
+function btq_pricing_defaults() {
     static $t = null;
     if ($t === null) {
         $t = array(
@@ -59,10 +62,53 @@ function btq_pricing_tables() {
             'EMB_QUOTE_MIN'  => 84,      // 84+ on every embroidery tier is "by quote"
             'EMB_LOGO_MULT'  => 1.55,
             'EMB_HARD_ADDER' => 10.00,
+            // Handling per piece (threshold at 100 pcs is fixed).
+            'HANDLING_UNDER' => 0.50,
+            'HANDLING_OVER'  => 0.25,
         );
-        $t = apply_filters('btq_pricing_tables', $t);
     }
     return $t;
+}
+
+/**
+ * LIVE pricing tables = factory defaults + saved admin overrides
+ * (option btq_pricing_overrides, managed on the BT Quote → Pricing page).
+ * Only price/multiplier values can be overridden; qty anchors are fixed.
+ */
+function btq_pricing_tables() {
+    $t  = btq_pricing_defaults();
+    $ov = get_option('btq_pricing_overrides', array());
+    if (is_array($ov) && $ov) {
+        // Tier tables: override price at each fixed qty anchor, by index.
+        foreach (array('PRINT_TIERS', 'LOC2_TIERS', 'LOC3_TIERS', 'EMB_TEXT_TIERS') as $sec) {
+            if (!empty($ov[$sec]) && is_array($ov[$sec])) {
+                foreach ($ov[$sec] as $i => $price) {
+                    if (isset($t[$sec][$i])) $t[$sec][$i][1] = (float) $price;
+                }
+            }
+        }
+        // Garment qty-discount multipliers, by index.
+        if (!empty($ov['GMT_DISC']) && is_array($ov['GMT_DISC'])) {
+            foreach ($ov['GMT_DISC'] as $i => $mult) {
+                if (isset($t['GMT_DISC'][$i])) $t['GMT_DISC'][$i]['mult'] = (float) $mult;
+            }
+        }
+        // Garment prices, by key ('supplied' and 'custom' are fixed by design).
+        if (!empty($ov['GARMENTS']) && is_array($ov['GARMENTS'])) {
+            foreach ($ov['GARMENTS'] as $k => $price) {
+                if (isset($t['GARMENTS'][$k]) && $k !== 'supplied' && $k !== 'custom') {
+                    $t['GARMENTS'][$k] = (float) $price;
+                }
+            }
+        }
+        // Scalars.
+        if (isset($ov['EMB_LOGO_MULT']))  $t['EMB_LOGO_MULT']  = (float) $ov['EMB_LOGO_MULT'];
+        if (isset($ov['EMB_HARD_ADDER'])) $t['EMB_HARD_ADDER'] = (float) $ov['EMB_HARD_ADDER'];
+        if (isset($ov['EMB_QUOTE_MIN']))  $t['EMB_QUOTE_MIN']  = max(1, (int) $ov['EMB_QUOTE_MIN']);
+        if (isset($ov['HANDLING_UNDER'])) $t['HANDLING_UNDER'] = (float) $ov['HANDLING_UNDER'];
+        if (isset($ov['HANDLING_OVER']))  $t['HANDLING_OVER']  = (float) $ov['HANDLING_OVER'];
+    }
+    return apply_filters('btq_pricing_tables', $t);
 }
 
 /** Step-tier lookup: highest tier whose min qty <= q. */
@@ -104,7 +150,8 @@ function btq_gmt_cost($q, $retail) {
 }
 
 function btq_handling($q) {
-    return $q < 100 ? 0.50 : 0.25;
+    $T = btq_pricing_tables();
+    return $q < 100 ? $T['HANDLING_UNDER'] : $T['HANDLING_OVER'];
 }
 
 /** Print per-shirt: print + garment + handling + extra locations. */
