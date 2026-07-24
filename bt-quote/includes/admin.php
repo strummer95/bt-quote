@@ -19,7 +19,7 @@ function btq_group_bt_menus() {
     global $menu;
     if (!is_array($menu)) return;
 
-    $want  = array('dtf studio', 'bt catalog', 'bt quote'); // desired order
+    $want  = array('dtf studio', 'bt catalog', 'bt quote', 'bt portal'); // desired order
     $found = array();                                       // name => [key, item]
 
     foreach ($menu as $key => $item) {
