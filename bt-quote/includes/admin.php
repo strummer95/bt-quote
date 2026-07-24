@@ -8,6 +8,49 @@ add_action('admin_menu', function () {
     add_menu_page('BT Quote', 'BT Quote', 'manage_options', 'bt-quote', 'btq_admin_page', 'dashicons-calculator', 58);
 });
 
+/**
+ * Group the BT tools together in the admin sidebar:
+ * DTF Studio → BT Catalog → BT Quote, seated where the highest of them
+ * currently sits. Runs late so it wins regardless of what positions the
+ * individual plugins/snippets registered with.
+ */
+add_action('admin_menu', 'btq_group_bt_menus', 9999);
+function btq_group_bt_menus() {
+    global $menu;
+    if (!is_array($menu)) return;
+
+    $want  = array('dtf studio', 'bt catalog', 'bt quote'); // desired order
+    $found = array();                                       // name => [key, item]
+
+    foreach ($menu as $key => $item) {
+        if (!isset($item[0])) continue;
+        $label = strtolower(trim(wp_strip_all_tags($item[0])));
+        foreach ($want as $w) {
+            if (strpos($label, $w) === 0) { $found[$w] = array($key, $item); break; }
+        }
+    }
+    if (count($found) < 2) return; // nothing to group
+
+    // Anchor = the top-most current position among the found items.
+    $anchor = null;
+    foreach ($found as $f) {
+        $k = (float) $f[0];
+        if ($anchor === null || $k < $anchor) $anchor = $k;
+    }
+
+    foreach ($found as $f) unset($menu[$f[0]]);
+
+    $n = 0;
+    foreach ($want as $w) {
+        if (!isset($found[$w])) continue;
+        $k = $anchor + $n * 0.001;
+        while (isset($menu["$k"]) || isset($menu[(string) $k])) $k += 0.0001;
+        $menu["$k"] = $found[$w][1];
+        $n++;
+    }
+    ksort($menu, SORT_NUMERIC);
+}
+
 function btq_admin_page() {
     if (!current_user_can('manage_options')) return;
 
