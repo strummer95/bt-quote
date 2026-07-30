@@ -76,7 +76,33 @@ function btq_admin_page() {
     echo '<tr><td>Latest published</td><td>' . esc_html($latest) . '</td></tr>';
     echo '<tr><td>Pricing engine self-test</td><td>' . ($ok ? '<span style="color:#1a7f37;font-weight:700">PASS</span> &nbsp;(24× G5000 print = $' . esc_html(number_format($t1['perShirt'], 2)) . '/ea · 12× emb logo = $' . esc_html(number_format($t2['perShirt'], 2)) . '/ea)' : '<span style="color:#b91c1c;font-weight:700">FAIL</span>') . '</td></tr>';
     echo '<tr><td>Quote submissions email</td><td>' . esc_html(btq_quote_email()) . '</td></tr>';
+
+    $owner = btq_shortcode_owner();
+    if ($owner === 'plugin') {
+        $sc = '<span style="color:#1a7f37;font-weight:700">Served by this plugin</span>';
+    } elseif ($owner === 'other') {
+        $sc = '<span style="color:#b91c1c;font-weight:700">Overridden</span> &mdash; another copy (most likely the old '
+            . '<code>BT-Quick-Quote-Tool</code> snippet) is registering <code>[bt_quick_quote]</code> and winning. '
+            . 'Deactivate it so the plugin serves the tool.';
+    } else {
+        $sc = '<span style="color:#b91c1c;font-weight:700">Not registered</span>';
+    }
+    echo '<tr><td><code>[bt_quick_quote]</code></td><td>' . $sc . '</td></tr>';
     echo '</tbody></table>';
+
+    echo '<h2>Prefilled quote links</h2>';
+    echo '<p>Add query params to the Quick Quote page URL to open the tool with the boxes already filled in, '
+       . 'or use the <strong>Copy Quote Link</strong> button under the results to build one from what is on screen.</p>';
+    echo '<table class="widefat" style="max-width:640px"><tbody>';
+    echo '<tr><td><code>qty</code></td><td>1&ndash;1000</td></tr>';
+    echo '<tr><td><code>g</code></td><td>garment id (<code>g5000</code>, <code>g18500</code>, &hellip;), or <code>supplied</code> / <code>custom</code></td></tr>';
+    echo '<tr><td><code>loc</code></td><td>1&ndash;3 print locations</td></tr>';
+    echo '<tr><td><code>m</code></td><td><code>print</code> (default) or <code>emb</code></td></tr>';
+    echo '<tr><td><code>et</code></td><td><code>text</code> / <code>logo</code> / <code>hard</code> &mdash; embroidery only</td></tr>';
+    echo '<tr><td><code>r</code></td><td>retail dollars, with <code>g=custom</code></td></tr>';
+    echo '</tbody></table>';
+    echo '<p><code>' . esc_html(home_url('/quote/?qty=48&g=g5000&loc=2')) . '</code><br>';
+    echo '<code>' . esc_html(home_url('/quote/?qty=36&g=supplied&m=emb&et=logo')) . '</code></p>';
 
     echo '<h2>Updates</h2>';
     echo '<form method="post">';

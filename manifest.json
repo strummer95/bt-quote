@@ -1,10 +1,10 @@
 {
   "name": "BT Quote",
   "slug": "bt-quote",
-  "version": "0.2.2",
-  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.2.2.zip",
+  "version": "0.3.0",
+  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.3.0.zip",
   "homepage": "https://boomerts.com",
   "tested": "6.6",
   "requires": "5.8",
-  "changelog": "<h4>0.2.2</h4><ul><li>Admin menu grouping now includes BT Portal.</li></ul>v0.2.1 \u2014 Admin sidebar: DTF Studio, BT Catalog, and BT Quote now grouped together (seated at DTF Studio's position)."
+  "changelog": "<h4>0.3.0</h4><ul><li>Quick Quote tool now lives in the plugin: <code>[bt_quick_quote]</code> is registered here, so the BT-Quick-Quote-Tool snippet can be deactivated.</li><li>Prefilled quote links \u2014 the tool seeds itself from URL params (qty, g, loc, m, et, r), so a link can arrive with all three boxes already filled in.</li><li>New Copy Quote Link button under the results builds that link from what is on screen.</li><li>Submitted quotes now include the link in the email to orders@.</li><li>Shortcode attributes set page-level defaults; a URL param always wins.</li><li>Admin page reports which copy is serving the shortcode, and lists the link params.</li></ul>v0.2.2 \u2014 Admin menu grouping now includes BT Portal."
 }
