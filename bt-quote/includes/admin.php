@@ -91,8 +91,9 @@ function btq_admin_page() {
     echo '</tbody></table>';
 
     echo '<h2>Prefilled quote links</h2>';
-    echo '<p>Add query params to the Quick Quote page URL to open the tool with the boxes already filled in, '
-       . 'or use the <strong>Copy Quote Link</strong> button under the results to build one from what is on screen.</p>';
+    echo '<p>Add query params to the Quick Quote page URL to open the tool with the boxes already filled in. '
+       . 'The address bar also tracks the tool live, so the URL is always an accurate quote &mdash; copy it straight from '
+       . 'the bar, or use the <strong>Copy Quote Link</strong> button under the results.</p>';
     echo '<table class="widefat" style="max-width:640px"><tbody>';
     echo '<tr><td><code>qty</code></td><td>1&ndash;1000</td></tr>';
     echo '<tr><td><code>g</code></td><td>garment id (<code>g5000</code>, <code>g18500</code>, &hellip;), or <code>supplied</code> / <code>custom</code></td></tr>';

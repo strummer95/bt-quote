@@ -81,6 +81,7 @@
   var curQ = 12, curL = 1, curG = 'g5000', curRetail = '';
   var curTot = 0, curPerShirt = 0, curDiscPct = 0, curQuote = false;
   var debounceTimer = null, lastFetch = '';
+  var hadParams = false;
 
   function fmt(n) { return '$' + parseFloat(n).toFixed(2); }
   function g(id) { return document.getElementById(id); }
@@ -100,6 +101,7 @@
    */
   function applyPrefill() {
     var src = {}, k;
+    hadParams = false;
 
     var d = CFG.defaults || {};
     for (k in d) if (d[k] !== '' && d[k] !== null) src[k] = String(d[k]);
@@ -117,7 +119,7 @@
       };
       qs.forEach(function (val, key) {
         var slot = MAP[String(key).toLowerCase()];
-        if (slot && val !== '') src[slot] = val;
+        if (slot && val !== '') { src[slot] = val; hadParams = true; }
       });
     }
 
@@ -164,8 +166,28 @@
     }
   }
 
-  /** Build a shareable link that reproduces the current selections. */
+  /** Every key this tool owns — cleared before rewriting, so aliases can't linger. */
+  var OWNED = ['qty', 'g', 'garment', 'loc', 'locations', 'm', 'method', 'et', 'embtype', 'emb', 'r', 'retail'];
+
+  /**
+   * Build a link that reproduces the current selections.
+   * Anything else already on the URL (utm_source, fbclid, gclid, …) is kept —
+   * a customer following an ad link must not lose its tracking when the tool
+   * rewrites the address bar.
+   */
   function shareUrl() {
+    var qs;
+    try { qs = new URLSearchParams(window.location.search); } catch (e) { qs = null; }
+
+    var foreign = [];
+    if (qs) {
+      qs.forEach(function (val, key) {
+        if (OWNED.indexOf(String(key).toLowerCase()) === -1) {
+          foreign.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+        }
+      });
+    }
+
     var p = [];
     p.push('qty=' + curQ);
     p.push('g=' + encodeURIComponent(curG));
@@ -179,7 +201,28 @@
       var v = parseFloat((g('btCustomPrice') || {}).value || 0) || 0;
       if (v > 0) p.push('r=' + v.toFixed(2));
     }
-    return window.location.origin + window.location.pathname + '?' + p.join('&');
+
+    return window.location.origin + window.location.pathname
+      + '?' + p.concat(foreign).join('&')
+      + (window.location.hash || '');
+  }
+
+  /**
+   * Keep the address bar in sync with the tool, so the URL is always an
+   * accurate quote — copy it from the bar, bookmark it, or hit refresh and
+   * land on the same numbers.
+   *
+   * replaceState, not pushState: adjusting quantity should not stack up
+   * dozens of back-button steps. Called from the debounced path only, which
+   * keeps it clear of Safari's replaceState rate limit.
+   */
+  var syncEnabled = false;
+  function syncUrl() {
+    if (!syncEnabled) return;
+    try {
+      var next = shareUrl();
+      if (next !== window.location.href) window.history.replaceState(null, '', next);
+    } catch (e) { /* sandboxed / file:// — the tool still works, the URL just won't track */ }
   }
 
   function shareFeedback(msg, isErr) {
@@ -394,7 +437,7 @@
     var inp = g('btCustomPrice');
     if (!inp || document.activeElement !== inp) buildGmt();
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(btFetch, 150);
+    debounceTimer = setTimeout(function () { syncUrl(); btFetch(); }, 150);
   };
 
   window.btAdj = function (d) {
@@ -612,6 +655,15 @@
 
   var shareBtn = g('btShareBtn');
   if (shareBtn) shareBtn.addEventListener('click', copyShareLink);
+
+  // A URL that already carries quote params gets normalised on load (junk and
+  // aliases cleaned up). A clean /quote/ stays clean until the customer
+  // actually touches something — no params appear just for showing up.
+  syncEnabled = hadParams;
+  var enableSync = function () { syncEnabled = true; };
+  var root = g('btQuoteRoot');
+  root.addEventListener('click', enableSync, true);
+  root.addEventListener('input', enableSync, true);
 
   buildMethod();
   buildStep2();
