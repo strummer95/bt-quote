@@ -26,7 +26,7 @@ function btq_group_bt_menus() {
     if (!is_array($menu)) return;
 
     $want = apply_filters('bt_menu_group_order', array(
-        'dtf studio', 'bt catalog', 'bt quote', 'bt portal', 'bt transfers', 'bt accounts',
+        'bt accounts', 'bt catalog', 'bt portal', 'bt quote', 'bt transfers', 'dtf studio',
     ));
     $want  = array_values(array_unique(array_filter(array_map('strval', (array) $want))));
     $found = array();                                       // name => [key, item]
@@ -62,12 +62,6 @@ function btq_group_bt_menus() {
 
 function btq_admin_page() {
     if (!current_user_can('manage_options')) return;
-
-    if (isset($_POST['btq_check_updates'])) {
-        check_admin_referer('btq_admin');
-        btq_force_update_check();
-        echo '<div class="notice notice-success is-dismissible"><p>Update check refreshed — see <a href="' . esc_url(admin_url('plugins.php')) . '">Plugins</a> for any available update.</p></div>';
-    }
 
     $info   = btq_update_manifest();
     $latest = isset($info['version']) ? $info['version'] : '?';
@@ -114,11 +108,13 @@ function btq_admin_page() {
     echo '<p><code>' . esc_html(home_url('/quote/?qty=48&g=g5000&loc=2')) . '</code><br>';
     echo '<code>' . esc_html(home_url('/quote/?qty=36&g=supplied&m=emb&et=logo')) . '</code></p>';
 
-    echo '<h2>Updates</h2>';
-    echo '<form method="post">';
-    wp_nonce_field('btq_admin');
-    echo '<p><button class="button button-primary" name="btq_check_updates" value="1">Check now</button> &nbsp;Then update from the Plugins screen as usual.</p>';
-    echo '</form>';
+    // Shared BT panel — same layout, wording and button on every BT plugin.
+    bt_admin_updates_panel(array(
+        'slug'     => 'bt-quote',
+        'version'  => BTQ_VERSION,
+        'manifest' => 'btq_update_manifest',
+        'flush'    => 'btq_force_update_check',
+    ));
 
     echo '</div>';
 }

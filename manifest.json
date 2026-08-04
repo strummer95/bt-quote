@@ -1,10 +1,10 @@
 {
   "name": "BT Quote",
   "slug": "bt-quote",
-  "version": "0.3.2",
-  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.3.2.zip",
+  "version": "0.4.0",
+  "download_url": "https://raw.githubusercontent.com/strummer95/bt-quote/main/bt-quote-0.4.0.zip",
   "homepage": "https://boomerts.com",
   "tested": "6.6",
   "requires": "5.8",
-  "changelog": "<h4>0.3.2</h4><ul><li>The sidebar grouping now includes BT Transfers and BT Accounts, so all the BT tools sit together instead of some drifting off next to Analytics.</li><li>The group order is filterable via <code>bt_menu_group_order</code>, so a new BT plugin can slot itself in without needing a BT Quote release.</li></ul><h4>0.3.1</h4><ul><li>The address bar now tracks the tool live \u2014 change quantity, garment, locations or method and the URL updates to match, so it is always an accurate quote.</li><li>Uses replaceState, so adjusting quantity does not stack up back-button steps.</li><li>Existing tracking params (utm_source, fbclid, \u2026) are preserved when the URL is rewritten.</li><li>A clean /quote/ stays clean until the customer changes something.</li></ul>v0.3.0 \u2014 Quick Quote tool moved into the plugin as [bt_quick_quote], with prefilled quote links and a Copy Quote Link button."
+  "changelog": "<h4>0.4.0</h4><ul><li>Every BT plugin now shows the same <strong>Updates</strong> section in the same place &mdash; last on the page, same heading, same button, same wording. Shared file, so they cannot drift apart again.</li><li>Sidebar order is now alphabetical: BT Accounts, BT Catalog, BT Portal, BT Quote, BT Transfers.</li></ul><h4>0.3.2</h4><ul><li>The sidebar grouping now includes BT Transfers and BT Accounts, so all the BT tools sit together instead of some drifting off next to Analytics.</li><li>The group order is filterable via <code>bt_menu_group_order</code>, so a new BT plugin can slot itself in without needing a BT Quote release.</li></ul><h4>0.3.1</h4><ul><li>The address bar now tracks the tool live \u2014 change quantity, garment, locations or method and the URL updates to match, so it is always an accurate quote.</li><li>Uses replaceState, so adjusting quantity does not stack up back-button steps.</li><li>Existing tracking params (utm_source, fbclid, \u2026) are preserved when the URL is rewritten.</li><li>A clean /quote/ stays clean until the customer changes something.</li></ul>v0.3.0 \u2014 Quick Quote tool moved into the plugin as [bt_quick_quote], with prefilled quote links and a Copy Quote Link button."
 }
