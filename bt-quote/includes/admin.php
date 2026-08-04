@@ -9,17 +9,26 @@ add_action('admin_menu', function () {
 });
 
 /**
- * Group the BT tools together in the admin sidebar:
- * DTF Studio → BT Catalog → BT Quote, seated where the highest of them
- * currently sits. Runs late so it wins regardless of what positions the
+ * Group the BT tools together in the admin sidebar, seated where the highest of
+ * them currently sits. Runs late so it wins regardless of what positions the
  * individual plugins/snippets registered with.
+ *
+ * The order is filterable so a new BT plugin can slot itself in without needing
+ * a BT Quote release:
+ *
+ *   add_filter('bt_menu_group_order', function ($w) { $w[] = 'bt whatever'; return $w; });
+ *
+ * Entries are lowercase menu-label prefixes, matched from the start of the label.
  */
 add_action('admin_menu', 'btq_group_bt_menus', 9999);
 function btq_group_bt_menus() {
     global $menu;
     if (!is_array($menu)) return;
 
-    $want  = array('dtf studio', 'bt catalog', 'bt quote', 'bt portal'); // desired order
+    $want = apply_filters('bt_menu_group_order', array(
+        'dtf studio', 'bt catalog', 'bt quote', 'bt portal', 'bt transfers', 'bt accounts',
+    ));
+    $want  = array_values(array_unique(array_filter(array_map('strval', (array) $want))));
     $found = array();                                       // name => [key, item]
 
     foreach ($menu as $key => $item) {
