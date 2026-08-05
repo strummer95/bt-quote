@@ -26,6 +26,19 @@
   var CFG      = window.BTQ_QQ || {};
   var API_BASE = CFG.apiBase || '/wp-json/boomerts/v1';
 
+  /**
+   * The tool normally owns its page, so it keeps the address bar in sync and
+   * builds share links off the current URL. When it is embedded as one tab of
+   * a larger app (the employee portal), neither is true: rewriting the URL
+   * hijacks the host page's address, and a "copy quote link" built from that
+   * address would send a customer to the employee portal instead of /quote/.
+   *
+   *   syncUrl   false  — never touch the address bar
+   *   shareBase URL    — build share links from this page instead of this one
+   */
+  var SYNC_URL   = CFG.syncUrl !== false;
+  var SHARE_BASE = CFG.shareBase || '';
+
   var METHODS = [
     { id: 'print',      label: 'Printed',     sub: 'Screen / DTF' },
     { id: 'embroidery', label: 'Embroidered', sub: 'Stitched' }
@@ -179,8 +192,10 @@
     var qs;
     try { qs = new URLSearchParams(window.location.search); } catch (e) { qs = null; }
 
+    // Embedded: the params on the current URL belong to the host page, not to
+    // a customer's ad link, so they are not carried over.
     var foreign = [];
-    if (qs) {
+    if (qs && !SHARE_BASE) {
       qs.forEach(function (val, key) {
         if (OWNED.indexOf(String(key).toLowerCase()) === -1) {
           foreign.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
@@ -202,9 +217,13 @@
       if (v > 0) p.push('r=' + v.toFixed(2));
     }
 
-    return window.location.origin + window.location.pathname
+    var base = SHARE_BASE
+      ? String(SHARE_BASE).replace(/[?#].*$/, '')
+      : window.location.origin + window.location.pathname;
+
+    return base
       + '?' + p.concat(foreign).join('&')
-      + (window.location.hash || '');
+      + (SHARE_BASE ? '' : (window.location.hash || ''));
   }
 
   /**
@@ -659,8 +678,8 @@
   // A URL that already carries quote params gets normalised on load (junk and
   // aliases cleaned up). A clean /quote/ stays clean until the customer
   // actually touches something — no params appear just for showing up.
-  syncEnabled = hadParams;
-  var enableSync = function () { syncEnabled = true; };
+  syncEnabled = SYNC_URL && hadParams;
+  var enableSync = function () { if (SYNC_URL) syncEnabled = true; };
   var root = g('btQuoteRoot');
   root.addEventListener('click', enableSync, true);
   root.addEventListener('input', enableSync, true);
