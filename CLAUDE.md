@@ -31,15 +31,20 @@ Steps: edit under `bt-quote/`, bump both version spots, `node --check` touched J
 (no PHP binary in the container, brace-audit by hand), build `bt-quote-X.Y.Z.zip` plus
 plain `bt-quote.zip` at the repo root, update `manifest.json` with the version, the
 **versioned** raw `download_url` and a changelog entry, commit and push to `main`. Dillon
-then does **BT Quote → Status & Updates → Check for updates now**, then
-**Plugins → Update Now**.
+then does **BT Quote → Check for updates** (the panel at the bottom of the BT Quote page),
+then **Plugins → Update Now**.
 
 `uploads.github.com` is blocked from the container, which is why releases use versioned raw
 zips instead of GitHub Release assets. The updater reads `manifest.json` through
 `api.github.com` with `Accept: application/vnd.github.raw`, so a push is live instantly.
 
-`includes/bt-admin.php` is byte-identical across bt-portal, bt-catalog, bt-quote and
-bt-accounts. Don't fork it; re-copy into all four in the same release round if it changes.
+`includes/bt-admin.php` is byte-identical across bt-portal, bt-catalog, bt-quote,
+bt-accounts and bt-dtf. Don't fork it; re-copy into all five in the same release round if
+it changes.
+
+**Where the update check lives is a fixed rule across the BT plugins:** the shared panel
+is the last thing on the plugin's own top-level admin page. Never a separate Updates
+submenu. BT Transfers was the one exception until 0.7.5 and it is not coming back.
 
 ## This plugin is a dependency
 
